@@ -17,7 +17,7 @@ export interface BridgeTimeouts {
 
 export const DEFAULT_TIMEOUTS: Readonly<BridgeTimeouts> = Object.freeze({
   connectMs: 10_000,
-  readIdleMs: 75_000,
+  readIdleMs: 150_000,
   checkMs: 10_000,
   stableConnectionMs: 10_000,
   runtimeDeliveryMs: 15 * 60_000,

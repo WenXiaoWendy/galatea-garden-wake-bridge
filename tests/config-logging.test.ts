@@ -16,6 +16,7 @@ test("accepts HTTP only for local Garden URLs", () => {
     GARDEN_MACHINE_TOKEN: "secret",
   });
   assert.equal(local.baseUrl.origin, "http://127.0.0.1:8787");
+  assert.equal(local.timeouts.readIdleMs, 150_000);
   assert.deepEqual(local.wakeMessageMap, {});
   assert.deepEqual(local.injector, {
     executable: undefined,
