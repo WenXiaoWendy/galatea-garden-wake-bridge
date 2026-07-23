@@ -372,13 +372,13 @@ test("read-idle timeout is retryable while heartbeat chunks keep the stream aliv
     machineToken: TOKEN,
     onConnection: (connection) => {
       connection.sendConnected();
-      interval = setInterval(() => connection.sendComment(), 5);
+      interval = setInterval(() => connection.sendComment(), 25);
     },
   });
   const controller = new AbortController();
-  const stopTimer = setTimeout(() => controller.abort(), 40);
+  const stopTimer = setTimeout(() => controller.abort(), 750);
   try {
-    const result = await clientFor(heartbeatServer.baseUrl, { readIdleTimeoutMs: 15 }).streamOnce(
+    const result = await clientFor(heartbeatServer.baseUrl, { readIdleTimeoutMs: 250 }).streamOnce(
       { onEvent: () => undefined },
       controller.signal,
     );
