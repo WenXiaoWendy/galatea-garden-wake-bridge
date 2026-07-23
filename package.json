@@ -13,7 +13,7 @@
   "scripts": {
     "build": "node scripts/clean-dist.mjs && tsc -p tsconfig.json",
     "typecheck": "tsc --noEmit -p tsconfig.json && tsc --noEmit -p tsconfig.test.json",
-    "test": "npm run build && tsx --test tests/*.test.ts tests/*.test.mjs",
+    "test": "npm run build && node scripts/run-tests.mjs",
     "dev": "tsx src/cli.ts",
     "start": "node dist/cli.js"
   },
