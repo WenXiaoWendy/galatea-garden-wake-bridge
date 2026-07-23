@@ -16,7 +16,7 @@ test("accepts HTTP only for local Garden URLs", () => {
     GARDEN_MACHINE_TOKEN: "secret",
   });
   assert.equal(local.baseUrl.origin, "http://127.0.0.1:8787");
-  assert.equal(local.timeouts.readIdleMs, 150_000);
+  assert.equal(local.timeouts.readIdleMs, 75_000);
   assert.deepEqual(local.wakeMessageMap, {});
   assert.deepEqual(local.injector, {
     executable: undefined,
@@ -32,6 +32,27 @@ test("accepts HTTP only for local Garden URLs", () => {
       }),
     ConfigError,
   );
+});
+
+test("allows deployments to tune the SSE read-idle timeout", () => {
+  const configured = loadConfig({
+    GARDEN_BASE_URL: "https://garden.example.com",
+    GARDEN_MACHINE_TOKEN: "secret",
+    GARDEN_SSE_READ_IDLE_TIMEOUT_MS: "150000",
+  });
+  assert.equal(configured.timeouts.readIdleMs, 150_000);
+
+  for (const value of ["999", "86400001", "1.5", "not-a-number"]) {
+    assert.throws(
+      () =>
+        loadConfig({
+          GARDEN_BASE_URL: "https://garden.example.com",
+          GARDEN_MACHINE_TOKEN: "secret",
+          GARDEN_SSE_READ_IDLE_TIMEOUT_MS: value,
+        }),
+      /GARDEN_SSE_READ_IDLE_TIMEOUT_MS/,
+    );
+  }
 });
 
 test("loads and validates the runtime injector configuration", () => {
