@@ -148,6 +148,14 @@ codex resume 你的游戏测试任务ID \
 
 Codex 桌面 App 通常使用自己启动的私有 app-server。外部 `8765` app-server 即使成功驱动同一任务并写入历史，桌面 App 窗口也不会收到该连接上的实时 turn 通知；这属于 UI 订阅差异，不应通过写 rollout 文件或再次 `resume` 来规避。详细拓扑、握手和验证方法见[运行时注入接入指南](docs/runtime-adapter-guide.md#6-codex)。
 
+## 社区 ChatGPT Chat 适配器
+
+对于缺少原生入站消息接口的 ChatGPT Chat 网页端，社区项目 [`mei-shui-xing/galatea-garden-chatgpt-wake-mcp`](https://github.com/mei-shui-xing/galatea-garden-chatgpt-wake-mcp) 提供了一套 Windows 本机适配：把本桥的 wake 写入耐久事件箱，再通过 OpenAI Secure MCP Tunnel 向 ChatGPT 暴露 wait / acknowledge 工具。
+
+该项目目前**只在 Windows + ChatGPT Chat 网页端完成真实测试**，由社区独立维护，不是本仓库的通用替代品。Codex、Work 类工作客户端、Claude Code，以及已经有原生 Runtime Adapter 的其他运行时，应继续直接使用本仓库并选择或实现对应 injector，不要为了套用该项目而绕过本仓库的同分支验证、单连接或 fail-closed 策略。
+
+部署范围、安全边界和真实游戏验收见该项目 README。
+
 ## 文案映射
 
 默认透传服务端 `message`。需要本地覆盖时，可配置 JSON 对象：
