@@ -57,6 +57,7 @@ test("delivers one versioned wake envelope to the configured injector stdin", as
   const controller = new AbortController();
 
   await adapter.wake({
+    id: "wake_101",
     reason: "game_turn_required",
     message: "游戏轮到你了。请调用 Garden MCP 的 get_my_status 查看当前局面。",
     signal: controller.signal,
@@ -72,6 +73,7 @@ test("delivers one versioned wake envelope to the configured injector stdin", as
   assert.deepEqual(JSON.parse(stdin), {
     version: 1,
     type: "garden_wake",
+    id: "wake_101",
     reason: "game_turn_required",
     message: "游戏轮到你了。请调用 Garden MCP 的 get_my_status 查看当前局面。",
   });
@@ -95,6 +97,7 @@ test("reports non-zero injector exits with bounded stderr", async () => {
   await assert.rejects(
     () =>
       adapter.wake({
+        id: "wake_102",
         reason: "forum_notification_available",
         message: "查看通知",
         signal: new AbortController().signal,
@@ -128,6 +131,7 @@ test("passes cancellation to the injector process", async () => {
   );
   const controller = new AbortController();
   const waking = adapter.wake({
+    id: "wake_103",
     reason: "forum_notification_available",
     message: "查看通知",
     signal: controller.signal,

@@ -83,11 +83,13 @@ test("overrides only configured wake messages and delivers queued wakes before e
       handlers.onEvent({ kind: "connected", version: 1 });
       handlers.onEvent({
         kind: "wake",
+        id: "wake_201",
         reason: "game_turn_required",
         message: "服务端游戏文案",
       });
       handlers.onEvent({
         kind: "wake",
+        id: "wake_202",
         reason: "forum_notification_available",
         message: "服务端论坛通知文案",
       });
@@ -103,8 +105,8 @@ test("overrides only configured wake messages and delivers queued wakes before e
           wakeMessageMap: { game_turn_required: "本地自定义游戏文案" },
         },
         {
-          wake: async ({ reason, message }) => {
-            received.push({ reason, message });
+          wake: async ({ id, reason, message }) => {
+            received.push({ id, reason, message });
           },
         },
         silentLogger,
@@ -115,8 +117,8 @@ test("overrides only configured wake messages and delivers queued wakes before e
   );
 
   assert.deepEqual(received, [
-    { reason: "game_turn_required", message: "本地自定义游戏文案" },
-    { reason: "forum_notification_available", message: "服务端论坛通知文案" },
+    { id: "wake_201", reason: "game_turn_required", message: "本地自定义游戏文案" },
+    { id: "wake_202", reason: "forum_notification_available", message: "服务端论坛通知文案" },
   ]);
 });
 
@@ -168,12 +170,12 @@ test("routes SSE wakes end to end through the runner and runtime adapter", async
     },
   });
   const controller = new AbortController();
-  const received: Array<{ reason: string; message: string }> = [];
+  const received: Array<{ id: string; reason: string; message: string }> = [];
   let adapterClosed = false;
   const adapter: RuntimeAdapter = {
     wake: async (input) => {
       input.signal.throwIfAborted();
-      received.push({ reason: input.reason, message: input.message });
+      received.push({ id: input.id, reason: input.reason, message: input.message });
       if (received.length === 2) {
         controller.abort();
       }
@@ -196,10 +198,12 @@ test("routes SSE wakes end to end through the runner and runtime adapter", async
     );
     assert.deepEqual(received, [
       {
+        id: "wake_1",
         reason: "game_turn_required",
         message: "游戏轮到你了。请调用 Garden MCP 的 get_my_status 查看当前局面。",
       },
       {
+        id: "wake_2",
         reason: "notification_available",
         message: "你有新的 Garden 通知，请调用 Garden MCP 查看。",
       },

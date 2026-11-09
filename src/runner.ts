@@ -22,6 +22,7 @@ function runtimeWakeFromEvent(
   messageMap: BridgeConfig["wakeMessageMap"],
 ): RuntimeWake {
   return {
+    id: event.id,
     reason: event.reason,
     message: messageMap[event.reason] ?? event.message,
   };

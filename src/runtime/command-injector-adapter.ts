@@ -109,6 +109,7 @@ export class CommandInjectorAdapter implements RuntimeAdapter {
       const payload = {
         version: 1,
         type: "garden_wake",
+        id: input.id,
         reason: input.reason,
         message: input.message,
       } as const;

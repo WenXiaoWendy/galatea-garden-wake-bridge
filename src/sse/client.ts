@@ -1,4 +1,5 @@
 import { validateGardenBaseUrl } from "../config.js";
+import { randomUUID } from "node:crypto";
 import type { Logger } from "../logging.js";
 import { safeErrorMessage } from "../logging.js";
 import {
@@ -105,7 +106,14 @@ export class GardenSseClient {
       let stopRequested = false;
       const parser = new SseParser({
         onEvent: (rawEvent) => {
-          const event = decodeGardenEvent(rawEvent);
+          // The production Wake endpoint currently omits SSE `id:` fields.
+          // Mint one exactly once at ingress so retries of the same decoded
+          // RuntimeWake keep a stable identifier while separate wakes never
+          // collapse into one Home bridge event.
+          const identifiedEvent = rawEvent.event === GARDEN_PROTOCOL.events.wake && !rawEvent.id
+            ? { ...rawEvent, id: `wake_${randomUUID().replaceAll("-", "")}` }
+            : rawEvent;
+          const event = decodeGardenEvent(identifiedEvent);
           if (event.kind === "ignored") {
             if (event.severity === "terminal") {
               throw new GardenStreamError("terminal", event.cause);

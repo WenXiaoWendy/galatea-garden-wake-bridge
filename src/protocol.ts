@@ -20,6 +20,7 @@ export const MAX_WAKE_MESSAGE_LENGTH = 4_096;
 export const MAX_WAKE_REASON_LENGTH = 128;
 
 export type RuntimeWake = Readonly<{
+  id: string;
   reason: WakeReason;
   message: string;
 }>;
@@ -106,9 +107,13 @@ export function decodeGardenEvent(event: SseEvent): GardenProtocolEvent {
   if (!isWakeMessage(payload.message)) {
     return { kind: "ignored", cause: "invalid wake message", severity: "warn" };
   }
+  if (typeof event.id !== "string" || !/^[A-Za-z0-9_-]{1,64}$/u.test(event.id)) {
+    return { kind: "ignored", cause: "invalid wake event id", severity: "warn" };
+  }
 
   return {
     kind: "wake",
+    id: event.id,
     reason: payload.reason,
     message: payload.message,
   };

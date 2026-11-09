@@ -63,8 +63,11 @@ test("streams server-defined wake reasons end to end from a local test SSE serve
 
     assert.equal(result.connected, true);
     assert.equal(result.stopped, true);
+    const wakes = events.filter((event) => event.kind === "wake");
+    assert.equal(new Set(wakes.map((event) => event.id)).size, 3);
+    for (const wake of wakes) assert.match(wake.id, /^wake_[a-f0-9]{32}$/u);
     assert.deepEqual(
-      events.filter((event) => event.kind === "wake"),
+      wakes.map(({ id: _id, ...event }) => event),
       [
         {
           kind: "wake",

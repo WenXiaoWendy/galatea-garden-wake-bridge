@@ -7,8 +7,8 @@ import { WakeDispatcher } from "../src/runtime/dispatcher.js";
 
 function wake(reason: WakeReason, message?: string): RuntimeWake {
   return reason === "game_turn_required"
-    ? { reason, message: message ?? "游戏轮到你了。" }
-    : { reason, message: message ?? "你有新的 Garden 通知。" };
+    ? { id: `wake_${reason}`, reason, message: message ?? "游戏轮到你了。" }
+    : { id: `wake_${reason}`, reason, message: message ?? "你有新的 Garden 通知。" };
 }
 
 interface Deferred<T> {

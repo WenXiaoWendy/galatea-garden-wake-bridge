@@ -21,8 +21,8 @@ export interface RunningTestGardenServer {
   close(): Promise<void>;
 }
 
-function writeEvent(response: ServerResponse, event: string, payload: unknown): void {
-  response.write(`event: ${event}\ndata: ${JSON.stringify(payload)}\n\n`);
+function writeEvent(response: ServerResponse, event: string, payload: unknown, id?: string): void {
+  response.write(`${id ? `id: ${id}\n` : ""}event: ${event}\ndata: ${JSON.stringify(payload)}\n\n`);
 }
 
 function listen(server: Server, port: number, hostname: string): Promise<void> {
@@ -42,6 +42,7 @@ export async function startTestGardenServer(
   const port = options.port ?? 0;
   const machineToken = options.machineToken ?? "test-machine-token";
   const clients = new Set<ServerResponse>();
+  let wakeSequence = 0;
 
   const server = createServer((request, response) => {
     if (request.url !== GARDEN_PROTOCOL.streamPath || request.method !== "GET") {
@@ -68,7 +69,7 @@ export async function startTestGardenServer(
           version: GARDEN_PROTOCOL.version,
         }),
       sendWake: (reason, message) =>
-        writeEvent(response, GARDEN_PROTOCOL.events.wake, { reason, message }),
+        writeEvent(response, GARDEN_PROTOCOL.events.wake, { reason, message }, `wake_${++wakeSequence}`),
       sendComment: (comment = "ping") => response.write(`: ${comment}\n\n`),
       writeRaw: (chunk) => response.write(chunk),
       close: () => response.end(),
